@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React, { useState, useEffect } from 'react';
+import KanbanBoard from './components/KanbanBoard';
 
-function App() {
+const App = () => {
+  const [tickets, setTickets] = useState([]);
+  const [displayState, setDisplayState] = useState('status'); // Default display state
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://api.quicksell.co/v1/internal/frontend-assignment');
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          // Assuming the API returns an array of tickets
+          setTickets(data);
+        } else {
+          console.error('Data format error: API response is not an array.');
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleDisplayStateChange = (newDisplayState) => {
+    setDisplayState(newDisplayState);
+    localStorage.setItem('displayState', newDisplayState);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <KanbanBoard tickets={tickets} displayState={displayState} />
     </div>
   );
-}
+};
 
 export default App;
